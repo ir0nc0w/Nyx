@@ -5,13 +5,14 @@ OS_PATH=$PROJECT_PATH/nyx_fuzzer/hypervisor_spec/build/hypertrash_os
 PAYLOAD_DIR=$PROJECT_PATH/workdir_qemu/corpus/dump
 GCOV_PATH=$PROJECT_PATH/Targets/qemu/gcov/gcov
 
-TIMEOUT=60
+TIMEOUT=600
 idx=1
 prevCnt=0
 currCnt=0
 
 # ex) ./gcov.sh 0 usb-xhci qemu0 
 
+cp usbdisk.img usbdisk"$1".img
 rm -rf $GCOV_PATH
 mkdir -p $GCOV_PATH
 rm -rf $GCOV_PATH/$1
@@ -25,7 +26,7 @@ do
 			echo "[!] SECONDS: $SECONDS"
 			SECONDS=0
 			mkdir -p $GCOV_PATH/$1/$currCnt
-			mv $PAYLOAD_DIR/$1/* $GCOV_PATH/$1/$currCnt
+			mv $PAYLOAD_DIR/$1/* $GCOV_PATH/$1/$currCnt || true
 			let currCnt=$currCnt+1
 		fi
 	else
@@ -38,7 +39,7 @@ do
 		if [[ $SECONDS -ge $TIMEOUT ]]; then
 			SECONDS=0
 			mkdir -p $GCOV_PATH/$1/$currCnt
-			mv $PAYLOAD_DIR/$1/* $GCOV_PATH/$1/$currCnt
+			mv $PAYLOAD_DIR/$1/* $GCOV_PATH/$1/$currCnt || true
 			let currCnt=$currCnt+1
 		fi
 
@@ -49,7 +50,8 @@ do
 		make hypertrash_os_crash.bin
 
 		# [TIMEOUT] signal SIGKILL after 20 seconds.
-		timeout -s 9 20s $QEMU_PATH/qemu$1/build/qemu-system-x86_64 -cdrom $OS_PATH/iso/hypertrash_os_bios_crash.iso -m 100 -net none -device nec-usb-xhci -display none
+		echo "$QEMU_PATH/qemu"$1"/build/qemu-system-x86_64 -cdrom $OS_PATH/iso/hypertrash_os_bios_crash.iso -m 100 -net none -drive if=none,id=stick,file=$GCOV_PATH/../usbdisk"$1".img,format=raw -device nec-usb-xhci,id=usb -device usb-storage,bus=usb.0,drive=stick -display none"
+		timeout -s 9 20s $QEMU_PATH/qemu"$1"/build/qemu-system-x86_64 -cdrom $OS_PATH/iso/hypertrash_os_bios_crash.iso -m 100 -net none -drive if=none,id=stick,file=$GCOV_PATH/../usbdisk"$1".img,format=raw -device nec-usb-xhci,id=usb -device usb-storage,bus=usb.0,drive=stick -display none
 
 		rm $GCOV_PATH/$1/$prevCnt/$file
 

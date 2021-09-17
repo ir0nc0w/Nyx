@@ -24,8 +24,8 @@ def do_something(arg):
     gfile  = gcov_file 
     gfile += qemuN
     f = open(gfile, 'a')
-    cmd = cmd1 + cmd2
-    #cmd = cmd1 + qemuN + cmd2
+    #cmd = cmd1 + cmd2
+    cmd = cmd1 + qemuN + cmd2
     process = subprocess.Popen(cmd,shell=True,stdout=f)
     process.communicate()[0]
     f.close()

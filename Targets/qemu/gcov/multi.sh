@@ -1,6 +1,8 @@
 #!/bin/bash -e
 
-for idx in {0..7};
+./gcov.sh 0 usb-xhci qemu0 &
+
+for idx in {1..7};
 do
-	./gcov.sh $idx $1"-"$idx
+	nohup ./gcov.sh $idx usb-xhci qemu$idx & echo $! > run.pid$idx
 done
