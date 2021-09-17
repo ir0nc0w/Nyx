@@ -80,6 +80,7 @@ pub struct StructFuzzer<Fuzz: FuzzRunner + GetStructStorage> {
     bitmaps: BitmapHandler,
     config: FuzzerConfig,
 }
+static mut dump_cnt: [i64; 8] = [0, 0, 0, 0, 0, 0, 0, 0];
 
 impl<Fuzz: FuzzRunner + GetStructStorage> StructFuzzer<Fuzz> {
     pub fn new(fuzzer: Fuzz, config: FuzzerConfig, spec: GraphSpec, queue: Queue, seed: u64) -> Self {
@@ -107,11 +108,15 @@ impl<Fuzz: FuzzRunner + GetStructStorage> StructFuzzer<Fuzz> {
     {
         let (seed_x, seed_y) = (self.master_rng.next_u64(), self.master_rng.next_u64());
         self.rng.set_full_seed(seed_x, seed_y);
+        let mut storage;
         let strategy = {
-            let mut storage = self.fuzzer.get_struct_storage(self.mutator.spec.checksum);
+            storage = self.fuzzer.get_struct_storage(self.mutator.spec.checksum);
             f(&mut self.mutator, &self.queue, &self.rng, &mut storage)
         };
         //println!("EXEC.....");
+        let mut dump = self.mutator.dump_graph(&mut storage);
+        self.dump_input(&mut dump);
+
         let res = self.fuzzer.run_test();
 
         if let Ok(exec_res) = res {
@@ -150,6 +155,44 @@ impl<Fuzz: FuzzRunner + GetStructStorage> StructFuzzer<Fuzz> {
             return Some((exec_res, strategy));
         }
         return None;
+    }
+
+    unsafe fn bump_count_unsafe(&mut self) {
+        dump_cnt[self.config.thread_id] += 1;
+    }
+
+    fn dump_input(&mut self, data: &VecGraph) {
+        use std::fs;
+
+
+        //println!(
+        //    "Thread {} Dump input",
+        //    self.config.thread_id
+        //);
+
+        fs::create_dir_all(&format!(
+            "{}/corpus/dump/{}",
+            self.config.workdir_path,
+            self.config.thread_id
+        ))
+        .unwrap();
+
+        //dump_cnt[0] += 1;
+        let id;
+        unsafe {
+            self.bump_count_unsafe();
+            id = dump_cnt[self.config.thread_id].clone();
+        }
+
+        data.write_to_file(
+            &format!(
+                "{}/corpus/dump/{}/cnt_{}.bin",
+                self.config.workdir_path,
+                self.config.thread_id,
+                id
+            ),
+            &self.mutator.spec,
+        );
     }
 
     fn new_input(&mut self, input: &Input) {
