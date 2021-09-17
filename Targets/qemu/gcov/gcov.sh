@@ -1,7 +1,7 @@
 #!/bin/bash -e
 PROJECT_PATH="$(cd "$(dirname "$BASH_SOURCE")/../../.."; pwd -P)"
 QEMU_PATH=$PROJECT_PATH/QEMU
-OS_PATH=$PROJECT_PATH/nyx_fuzzer/hypervisor_spec/build/hypertrash_os
+OS_PATH=$PROJECT_PATH/nyx_fuzzer/hypervisor_spec/build/hypertrash_os"$1"
 PAYLOAD_DIR=$PROJECT_PATH/workdir_qemu/corpus/dump
 GCOV_PATH=$PROJECT_PATH/Targets/qemu/gcov/gcov
 
