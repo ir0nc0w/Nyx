@@ -114,9 +114,6 @@ impl<Fuzz: FuzzRunner + GetStructStorage> StructFuzzer<Fuzz> {
             f(&mut self.mutator, &self.queue, &self.rng, &mut storage)
         };
         //println!("EXEC.....");
-        let mut dump = self.mutator.dump_graph(&mut storage);
-        self.dump_input(&mut dump);
-
         let res = self.fuzzer.run_test();
 
         if let Ok(exec_res) = res {
@@ -128,12 +125,16 @@ impl<Fuzz: FuzzRunner + GetStructStorage> StructFuzzer<Fuzz> {
                     .queue
                     .check_new_bytes(self.fuzzer.bitmap_buffer(), &exec_res.exitreason)
                 {
-                    let data = {
+                    let mut data = {
                         let mut storage =
                             self.fuzzer.get_struct_storage(self.mutator.spec.checksum);
                         //let strategy = f(&self.mutator, &self.queue, &self.rng, &mut storage);
                         self.mutator.dump_graph(&storage)
                     };
+
+                    unsafe {
+                        self.dump_input(&mut data);
+                    }
 
                     let mut input = Input::new(
                         data,
