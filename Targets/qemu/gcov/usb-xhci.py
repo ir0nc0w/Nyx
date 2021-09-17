@@ -10,12 +10,12 @@ from daemon import pidfile
 gcov_file = ''
 qemuN = ''
 
-cmd1 = "gcov -n -c -b /home/cwmyung/study/hyfuzz/src/qemu-5.2"
+cmd1 = "gcov -n -c -b /mnt/hdb2/cwmyung/NYX/nyx0/QEMU/"
 cmd2 = "/build/libcommon.fa.p/hw_usb_hcd-xhci.c. | grep -n4 hcd-xhci.c | gawk \'{ print strftime(\"%m-%d %H:%M:%S\"), $0 }\'"
 
 def do_something(arg):
 
-    gcov_file = '/home/cwmyung/study/Nyx/Targets/qemu/gcov/gcov/gcov-'
+    gcov_file = '/mnt/hdb2/cwmyung/NYX/nyx0/Targets/qemu/gcov/gcov/gcov-'
     qemuN = arg
     # load the shared object file
     # gcov = CDLL('/home/user/gcov.so') ## Read DLL

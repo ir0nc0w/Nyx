@@ -2,9 +2,6 @@
 # HyperCube OS
 #
 # This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU Affero General Public License as
-# published by the Free Software Foundation, either version 3 of the
-# License, or (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -43,6 +40,8 @@ bin/payload.o:
 
 hypertrash_os_crash.bin: CFLAGS := $(CFLAGS) -DPAYLOAD
 hypertrash_os_crash.bin:  $(AS_OBJECTS) $(OBJECTS) bin/payload.o
+	rm bin/payload.o
+	objcopy -I binary -O elf32-i386 -B i386 misc/crash.hexa bin/payload.o
 	$(CC) $(LDFLAGS) -o bin/hypertrash_os.bin $(AS_OBJECTS) $(OBJECTS) bin/payload.o $(LIBS)
 	rm -rf isofiles/
 	mkdir isofiles
