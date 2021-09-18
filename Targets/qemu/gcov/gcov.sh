@@ -26,7 +26,7 @@ do
 			echo "[!] SECONDS: $SECONDS"
 			SECONDS=0
 			mkdir -p $GCOV_PATH/$1/$currCnt
-			mv $PAYLOAD_DIR/$1/* $GCOV_PATH/$1/$currCnt || true
+			mv $PAYLOAD_DIR/"0"/* $GCOV_PATH/$1/$currCnt || true
 			let currCnt=$currCnt+1
 		fi
 	else
@@ -39,7 +39,7 @@ do
 		if [[ $SECONDS -ge $TIMEOUT ]]; then
 			SECONDS=0
 			mkdir -p $GCOV_PATH/$1/$currCnt
-			mv $PAYLOAD_DIR/$1/* $GCOV_PATH/$1/$currCnt || true
+			mv $PAYLOAD_DIR/"0"/* $GCOV_PATH/$1/$currCnt || true
 			let currCnt=$currCnt+1
 		fi
 
