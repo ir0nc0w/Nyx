@@ -1,3 +1,9 @@
 #!/bin/bash -e
 
-pkill gcov.sh
+
+
+
+for pid in `ls run.pid*`;
+do
+	kill $(cat $pid)
+done
