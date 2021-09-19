@@ -372,3 +372,91 @@ def make_legacy_xhci(s):
   make_hypercube_generic(s)
   make_hypercube(s, 0x0, 0x100, 2, mmio=True)
   make_hypercube(s, 0x1821000, 0x4000, 0, mmio=True)
+
+"""
+LD_BIND_NOW=1 LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libasan.so.4:./hypertrash_crash_detector_asan ASAN_OPTIONS=log_path=/tmp/data.log:abort_on_error=true:detect_leaks=false 
+/home/user/qemu-5.0.0-rc3/x86_64-softmmu/qemu-system-x86_64 -cdrom hypertrash.iso -enable-kvm -m 100 -net none -nographic -device e1000e,netdev=net0 
+-netdev tap,id=net0,ifname=tap0,script=no,downscript=no
+"""
+def make_legacy_e1000e(s):
+  make_globals(s)
+  make_hypercube_generic(s)
+  make_hypercube(s, 0x0, 0x100, 2, mmio=True)
+  make_hypercube(s, 0x1821000, 0x20000, 0, mmio=True)
+  make_hypercube(s, 0xc000, 0x20, 1, mmio=False)
+  make_hypercube(s, 0x1841000, 0x20000, 3, mmio=True)
+  make_hypercube(s, 0x1861000, 0x4000, 4, mmio=True)
+
+"""
+qemu-img create hdd.img 10M
+LD_BIND_NOW=1 LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libasan.so.4:./hypertrash_crash_detector_asan ASAN_OPTIONS=log_path=/tmp/data.log:abort_on_error=true:detect_leaks=false 
+/home/user/qemu-5.0.0-rc3/x86_64-softmmu/qemu-system-x86_64 
+-cdrom hypertrash.iso -enable-kvm -m 100 -net none 
+-device nvme,drive=SystemDisk,serial=someserial -drive file=hdd.img,if=none,id=SystemDisk
+"""
+def make_legacy_nvme(s):
+  make_globals(s)
+  make_hypercube_generic(s)
+  make_hypercube(s, 0x0, 0x100, 2, mmio=True)
+  make_hypercube(s, 0x1821000, 0x2000, 0, mmio=True)
+  make_hypercube(s, 0x1823000, 0x1000, 1, mmio=True)
+
+#TODO
+"""
+qemu-img create hdd.img 10M
+LD_BIND_NOW=1 LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libasan.so.4:./hypertrash_crash_detector_asan ASAN_OPTIONS=log_path=/tmp/data.log:abort_on_error=true:detect_leaks=false 
+/home/user/qemu-5.0.0-rc3/x86_64-softmmu/qemu-system-x86_64 
+-cdrom hypertrash.iso -enable-kvm -m 100 -net none 
+-device am53c974,id=scsi -device scsi-hd,drive=SysDisk -drive id=SysDisk,if=none,file=hdd.img
+"""
+def make_legacy_am53c974(s):
+  make_globals(s)
+  make_hypercube_generic(s)
+  make_hypercube(s, 0x0, 0x100, 2, mmio=True)
+  make_hypercube(s, 0xc000, 0x80, 0, mmio=False)
+
+"""
+qemu-img create hdd.img 10M
+LD_BIND_NOW=1 LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libasan.so.4:./hypertrash_crash_detector_asan ASAN_OPTIONS=log_path=/tmp/data.log:abort_on_error=true:detect_leaks=false 
+/home/user/qemu-5.0.0-rc3/x86_64-softmmu/qemu-system-x86_64 
+-cdrom hypertrash.iso -enable-kvm -m 100 -net none 
+-device am53c974,id=scsi -device scsi-hd,drive=SysDisk -drive id=SysDisk,if=none,file=hdd.img
+"""
+
+def make_legacy_megasas(s):
+  make_globals(s)
+  make_hypercube_generic(s)
+  make_hypercube(s, 0x0, 0x100, 2, mmio=True)
+  make_hypercube(s, 0x1821000, 0x4000, 0, mmio=True)
+  make_hypercube(s, 0x1825000, 0x40000, 1, mmio=True)
+  make_hypercube(s, 0xc000, 0x100, 3, mmio=False)
+
+"""
+qemu-img create hdd.img 10M
+LD_BIND_NOW=1 LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libasan.so.4:./hypertrash_crash_detector_asan ASAN_OPTIONS=log_path=/tmp/data.log:abort_on_error=true:detect_leaks=false 
+/home/user/qemu-5.0.0-rc3/x86_64-softmmu/qemu-system-x86_64 
+-cdrom hypertrash.iso -enable-kvm -m 100 -net none 
+-drive if=none,id=stick,file=hdd.img,format=raw -device pci-ohci,id=usb -device usb-storage,bus=usb.0,drive=stick
+"""
+
+def make_legacy_ohci(s):
+  make_globals(s)
+  make_hypercube_generic(s)
+  make_hypercube(s, 0x0, 0x100, 2, mmio=True)
+  make_hypercube(s, 0x1821000, 0x100, 0, mmio=True)
+
+"""
+qemu-img create hdd.img 10M
+LD_BIND_NOW=1 LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libasan.so.4:./hypertrash_crash_detector_asan ASAN_OPTIONS=log_path=/tmp/data.log:abort_on_error=true:detect_leaks=false 
+/home/user/qemu-5.0.0-rc3/x86_64-softmmu/qemu-system-x86_64 
+-cdrom hypertrash.iso -enable-kvm -m 100 -net none 
+-drive if=none,id=stick,file=hdd.img,format=raw -device usb-ehci,id=usb -device usb-storage,bus=usb.0,drive=stick
+"""
+
+def make_legacy_ehci(s):
+  make_globals(s)
+  make_hypercube_generic(s)
+  make_hypercube(s, 0x0, 0x100, 2, mmio=True)
+  make_hypercube(s, 0x1821000, 0x1000, 0, mmio=True)
+
+

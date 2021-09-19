@@ -8,7 +8,7 @@ from spec_lib.generators import opts,flags,limits
 
 import jinja2
 
-from hexa_spec.legacy import make_legacy_pcnet, make_legacy_rtl8139, make_legacy_e1000, make_legacy_ee100pro, make_legacy_sdhci, make_legacy_intel_hda, make_legacy_ac97, make_legacy_ide_core, make_legacy_floppy, make_legacy_parallel, make_legacy_serial, make_legacy_cs4231a, make_legacy_xhci
+from hexa_spec.legacy import make_legacy_pcnet, make_legacy_rtl8139, make_legacy_e1000, make_legacy_ee100pro, make_legacy_sdhci, make_legacy_intel_hda, make_legacy_ac97, make_legacy_ide_core, make_legacy_floppy, make_legacy_parallel, make_legacy_serial, make_legacy_cs4231a, make_legacy_xhci, make_legacy_e1000e, make_legacy_nvme, make_legacy_am53c974, make_legacy_megasas, make_legacy_ohci, make_legacy_ehci
 
 from hexa_spec.ahci import make_ahci
 
@@ -59,6 +59,18 @@ if len(sys.argv) == 2:
         make_legacy_cs4231a(s)
     elif target == "legacy_ac97":
         make_legacy_ac97(s)
+    elif target == "legacy_e1000e":
+        make_legacy_e1000e(s)
+    elif target == "legacy_nvme":
+        make_legacy_nvme(s)
+    elif target == "legacy_am53c974":
+        make_legacy_am53c974(s)
+    elif target == "legacy_megasas":
+        make_legacy_megasas(s)
+    elif target == "legacy_ohci":
+        make_legacy_ohci(s)
+    elif target == "legacy_ehci":
+        make_legacy_ehci(s)
     else:
         sys.exit(0)
 

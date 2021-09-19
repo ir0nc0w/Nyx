@@ -3,7 +3,9 @@ cd build/hypertrash_os
 make clean 
 cd -
 #python3 gen_spec.py legacy_xhci
-python3 gen_spec.py legacy_xhci
+#python3 gen_spec.py legacy_xhci
+#python3 gen_spec.py qemu_xhci
+python3 gen_spec.py legacy_ehci
 cd build 
 cp bytecode_spec.template.h bytecode_spec.h
 cd hypertrash_os
