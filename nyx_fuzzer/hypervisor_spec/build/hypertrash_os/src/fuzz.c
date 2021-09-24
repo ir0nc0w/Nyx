@@ -189,6 +189,7 @@ void print_xhci_cap(uintptr_t base){
 	printf("HCCPRAMS2: -> 0x%x\n", *((volatile uint32_t*)(base+0x1c)));
 }
 
+uint32_t x32u = 314159265;
 static uint32_t xorshift32(){
   x32u ^= x32u << 13;
   x32u ^= x32u >> 17;
@@ -205,7 +206,6 @@ uint32_t mmioSize[] = {0x20000};
 uint32_t virtBase[] = {0x01821000};
 uint32_t ioBase[] = {0xc000};
 uint32_t ioSize[] = {0x40};
-uint32_t x32u = 314159265;
 
 void start_hypercube(uint8_t* payload_buffer){
 	state_t* state_obj = NULL;
