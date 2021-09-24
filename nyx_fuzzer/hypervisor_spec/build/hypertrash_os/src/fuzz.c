@@ -27,6 +27,8 @@
 #include "fuzz.h"
 #include "hypercube_opcodes.h"
 #include "../../interpreter.h"
+#include "serial.h"
+#include "../tesseract/core.h"
 
 //#define DEBUG
 
@@ -111,7 +113,8 @@ void register_area(fuzzer_state_t* self, uintptr_t base_address, uint32_t size, 
 		self->hexa_state->io_area[self->hexa_state->num_io_areas]->size = size;
 		memcpy(self->hexa_state->io_area[self->hexa_state->num_io_areas]->desc, description, strlen(description));
 		self->hexa_state->io_area[self->hexa_state->num_io_areas]->virtual_base = 0;
-		self->hexa_state->num_io_areas++;		
+		serial_printf(SERIAL_PORT_A,STR_PREFIX"%s - base:0x%x size:0x%x mmio:0x%d -> %s (V:0x%x)\n\r", __func__, base_address, size, mmio, description, self->hexa_state->mmio_area[self->hexa_state->num_mmio_areas]->virtual_base);
+		self->hexa_state->num_io_areas++;
 	}
 	
 	else{
@@ -121,6 +124,7 @@ void register_area(fuzzer_state_t* self, uintptr_t base_address, uint32_t size, 
 		self->hexa_state->mmio_area[self->hexa_state->num_mmio_areas]->size = size;
 		memcpy(self->hexa_state->mmio_area[self->hexa_state->num_mmio_areas]->desc, description, strlen(description));
 		self->hexa_state->mmio_area[self->hexa_state->num_mmio_areas]->virtual_base = (uintptr_t)virtual_map(base_address, size);
+		serial_printf(SERIAL_PORT_A,STR_PREFIX"%s - base:0x%x size:0x%x mmio:0x%d -> %s (V:0x%x)\n\r", __func__, base_address, size, mmio, description, self->hexa_state->mmio_area[self->hexa_state->num_mmio_areas]->virtual_base);
 		self->hexa_state->num_mmio_areas++;
 	}
 
@@ -183,6 +187,80 @@ void print_xhci_cap(uintptr_t base){
 	printf("DBOFF: -> 0x%x\n", *((volatile uint32_t*)(base+0x14)));
 	printf("RTSOFF: -> 0x%x\n", *((volatile uint32_t*)(base+0x18)));
 	printf("HCCPRAMS2: -> 0x%x\n", *((volatile uint32_t*)(base+0x1c)));
+}
+
+static uint32_t xorshift32(){
+  x32u ^= x32u << 13;
+  x32u ^= x32u >> 17;
+  x32u ^= x32u << 5;
+  return x32u;
+}
+
+static void set_seed(uint32_t seed){
+	x32u ^= seed;
+}
+
+uint32_t mmioBase[] = {0xfebc0000};
+uint32_t mmioSize[] = {0x20000};
+uint32_t virtBase[] = {0x01821000};
+uint32_t ioBase[] = {0xc000};
+uint32_t ioSize[] = {0x40};
+uint32_t x32u = 314159265;
+
+void start_hypercube(uint8_t* payload_buffer){
+	state_t* state_obj = NULL;
+	uint32_t* input_base = NULL;
+	uint32_t len = 0;
+
+	uint32_t seed = *(uint32_t*)(payload_buffer);
+	serial_printf(SERIAL_PORT_A, "================== SEED ==================\n");
+	serial_printf(SERIAL_PORT_A, "seed: 0x%x\n", seed);
+	serial_printf(SERIAL_PORT_A,"===========================================\n");
+
+	state_obj = new_state();
+	state_obj->num_mmio_areas = 1;
+	state_obj->num_io_areas = 1;
+	state_obj->mmio_area = (area_t**)kmalloc(sizeof(area_t*) * (size_t)state_obj->num_mmio_areas);
+	state_obj->io_area = (area_t**)kmalloc(sizeof(area_t*) * (size_t)state_obj->num_io_areas);
+
+	for(uint16_t i = 0; i < state_obj->num_mmio_areas; i++){
+		state_obj->mmio_area[i] = (area_t*)kmalloc(sizeof(area_t));
+		memset(state_obj->mmio_area[i], 0x0, sizeof(area_t));
+		state_obj->mmio_area[i]->base = mmioBase[i];
+		state_obj->mmio_area[i]->size = mmioSize[i];
+		state_obj->mmio_area[i]->virtual_base = virtBase[i];
+	}
+
+	for(uint16_t i = 0; i < state_obj->num_io_areas; i++){
+		state_obj->io_area[i] = (area_t*)kmalloc(sizeof(area_t));
+		memset(state_obj->io_area[i], 0x0, sizeof(area_t));
+		state_obj->io_area[i]->base = ioBase[i];
+		state_obj->io_area[i]->size = ioSize[i];
+	}
+	serial_printf(SERIAL_PORT_A, "============== CONFIGURATION ==============\n");
+	for(uint16_t i = 0; i < state_obj->num_mmio_areas; i++){
+		serial_printf(SERIAL_PORT_A,"mmio_area[%d] =\t{\n\t\t  base = %0x;\n\t\t  size = 0x%x;\n\t\t  desc = \"%s\";\n\t\t};\n", i, state_obj->mmio_area[i]->base, state_obj->mmio_area[i]->size);
+	}
+	for(uint16_t i = 0; i < state_obj->num_io_areas; i++){
+		serial_printf(SERIAL_PORT_A, "io_area[%d] =\t{\n\t\t  base = 0x%x;\n\t\t  size = 0x%x;\n\t\t  desc = \"%s\";\n\t\t};\n", i, state_obj->io_area[i]->base, state_obj->io_area[i]->size);
+	}
+	serial_printf(SERIAL_PORT_A,"===========================================\n");
+
+	size_t input_buffer_size = 0x1000*32;
+	input_base = kvmalloc(input_buffer_size);
+
+	while(1) {
+		serial_printf(SERIAL_PORT_A, "x32u: 0x%x\n", x32u);
+		for(uint32_t i = 0; i < ((0x1000*32)/4); i++){
+			input_base[i] = xorshift32();
+		}
+
+		run(input_base, input_buffer_size, state_obj);
+
+		memset(input_base, 0x0, 0x1000*32);
+	}
+
+
 }
 
 void start_fuzzing(uint8_t* payload_buffer, size_t payload_size){

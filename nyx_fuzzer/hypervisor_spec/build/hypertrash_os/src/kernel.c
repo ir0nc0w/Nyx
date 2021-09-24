@@ -172,7 +172,7 @@ void kernel_main(struct multiboot_tag* mbi, uint32_t mboot_magic, uint32_t foo) 
 	fuzzer = new_fuzzer();
 
 	if(fuzzer){
-		
+
 #ifdef IO_FUZZING
 			isa_state_enum(fuzzer);		
 #endif
@@ -188,13 +188,14 @@ void kernel_main(struct multiboot_tag* mbi, uint32_t mboot_magic, uint32_t foo) 
 #ifdef HPET_FUZZING
 			register_area(fuzzer, 0xFed00000, 0x1000, 1, "HPET");
 #endif
-		
+
 		print_mem_stats();
 
 		uint8_t* payload_buffer = prepare_fuzzing(fuzzer);
 		kernel_ready();
 
-		start_fuzzing(payload_buffer, (64 * 1024));
+		start_hypercube(payload_buffer);
+		//start_fuzzing(payload_buffer, (64 * 1024));
 	}
 	printf("Shutdown...\n");
 	

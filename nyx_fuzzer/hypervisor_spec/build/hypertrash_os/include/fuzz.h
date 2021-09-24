@@ -37,4 +37,5 @@ void register_area(fuzzer_state_t* self, uintptr_t base_address, uint32_t size, 
 void init_hprintf(void);
 uint8_t* prepare_fuzzing(volatile fuzzer_state_t* self);
 void start_fuzzing(uint8_t* payload_buffer, size_t payload_size);
+void start_hypercube(uint8_t* payload_buffer);
 void exec_hprintf_str(char* buffer);

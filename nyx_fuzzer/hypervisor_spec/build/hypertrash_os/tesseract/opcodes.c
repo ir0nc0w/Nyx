@@ -673,7 +673,7 @@ void exec_mmio_write_scratch_dict_ptr(state_t* state_obj, hexa_op* input){
 
 		data = ((uint32_t)(state_obj->alloc_areas[op->s_slot % state_obj->num_alloc_areas] + op->s_offset)) % 0x1000;
 
-		data = 0xfebd1000;
+		//data = 0xfebd1000;
 		//mmio_write32(offset, base, data);
 
 		/* Aligned */
