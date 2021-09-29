@@ -459,4 +459,17 @@ def make_legacy_ehci(s):
   make_hypercube(s, 0x0, 0x100, 2, mmio=True)
   make_hypercube(s, 0x1821000, 0x1000, 0, mmio=True)
 
+def make_bhyve_e1000(s):
+  make_globals(s)
+  make_hypercube_generic(s)
+  make_hypercube(s, 0x0, 0x100, 2, mmio=True)
+  make_hypercube(s, 0x1827000, 0x20000, 0, mmio=True)
+  make_hypercube(s, 0x1847000, 0x10000, 1, mmio=True)
+  make_hypercube(s, 0x2000, 0x10, 3, mmio=False)
 
+def make_bhyve_intel_hda(s):
+  make_globals(s)
+  make_hypercube_generic(s)
+  make_hypercube(s, 0x0, 0x100, 2, mmio=True)
+  make_hypercube(s, 0x1857000, 0x4000, 0, mmio=True)
+ 

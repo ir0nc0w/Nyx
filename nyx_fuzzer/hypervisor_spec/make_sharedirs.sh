@@ -2,7 +2,8 @@ set -e
 cd build/hypertrash_os
 make clean 
 cd -
-python3 gen_spec.py bhyve_ahci
+python3 gen_spec.py bhyve_intel_hda
+#python3 gen_spec.py bhyve_e1000
 cd build 
 cp bytecode_spec.template.h bytecode_spec.h
 cd hypertrash_os
