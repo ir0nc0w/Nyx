@@ -28,5 +28,5 @@ dd if=/dev/zero of=disk.img bs=1024 count=64
 
 bhyvectl --vm=testvm --destroy; 
 
-env MALLOC_PERTURB_=255 MALLOC_MMAP_PERTURB_=255 MALLOC_CHECK_=3 LD_PRELOAD=./hypertrash_crash_detector  /usr/sbin/bhyve  -w -H -s 0:0,hostbridge -s 1:0,lpc -s 2:0,ahci-cd,hypertrash.iso -l com1,stdio -s 3,fbuf,tcp=0.0.0.0:5900,w=800,h=600 -s 4:0,ahci-hd,hd:disk.img -c 1 -m 320M -l bootrom,/usr/local/share/uefi-firmware/BHYVE_UEFI_CSM.fd testvm 
+env MALLOC_PERTURB_=255 MALLOC_MMAP_PERTURB_=255 MALLOC_CHECK_=3 LD_PRELOAD=./hypertrash_crash_detector  /usr/sbin/bhyve  -w -H -s 0:0,hostbridge -s 1:0,lpc -s 2:0,ahci-cd,hypertrash.iso -l com1,stdio -s 3,fbuf,tcp=0.0.0.0:5900,w=800,h=600 -s 4:0,ahci-hd,hd:disk.img -s 5,e1000,tap0 -s 6,hda -c 1 -m 320M -l bootrom,/usr/local/share/uefi-firmware/BHYVE_UEFI_CSM.fd testvm 
 
